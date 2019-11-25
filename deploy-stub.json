@@ -1,0 +1,10 @@
+{
+  "database": {
+    "name": "mailtracker",
+    "user": "mailtracker",
+    "password": "secret"
+  },
+  "ingress": {
+    "hostname": "https://promo.herso.unwanted.consulting"
+  }
+}

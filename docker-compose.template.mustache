@@ -1,0 +1,42 @@
+version: "3"
+services:
+  mariadb:
+    image: mariadb:10.4
+    restart: unless-stopped
+    volumes:
+      - mariadb:/var/lib/mysql
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/usr/share/zoneinfo:/usr/share/zoneinfo:ro"
+    networks:
+      - mailtracker
+    environment:
+      MYSQL_DATABASE: {{database.name}}
+      MYSQL_USER: {{database.user}}
+      MYSQL_PASSWORD: {{{database.password}}}
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+  mailtracker:
+    image: nexus-docker.marvelous.systems:443/hummel/mailtracker:1.0.9
+    restart: unless-stopped
+    environment:
+      MARIADB_HOST: mariadb
+      MARIADB_USER: {{database.user}}
+      MARIADB_PASSWORD: {{database.password}}
+      MARIADB_DB: {{database.name}}
+      CONTENT_BASE: /app/content
+      HOSTNAME: {{{ingress.hostname}}}
+    networks:
+      - mailtracker
+      - {{ingress.network}}
+    volumes:
+      - images:/app/content
+volumes:
+  mariadb:
+    driver: local
+  images:
+    driver: local
+networks:
+  mailtracker:
+    driver: bridge
+  {{ingress.network}}:
+    external: true
